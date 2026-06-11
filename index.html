@@ -1,407 +1,10 @@
-<!DOCTYPE html>
-<html lang="es">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🏆 POLLA DEPINCCO - MUNDIAL 2026 - ¡Al Estilo Arcade! 🏆</title>
-
-  <meta name="description"
-    content="Participa en la Polla Mundialista 2026 organizada por Eduardo QM. Pronostica partidos, gana puntos y domina el ranking de cracks con esta app al estilo videojuego de fútbol.">
-  <meta name="author" content="Eduardo QM / Antigravity">
-
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            arcadeGreen: '#2ecc71',
-            arcadeDarkGreen: '#1b4f72',
-            arcadeYellow: '#f1c40f',
-            arcadeRed: '#e74c3c',
-            arcadeOrange: '#e67e22',
-            arcadePurple: '#9b59b6',
-            arcadeBlue: '#3498db',
-          },
-          borderWidth: {
-            '6': '6px',
-            '8': '8px',
-          }
-        }
-      }
-    }
-  </script>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
-
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
-  <style>
-    h1, h2, h3, .bangers-font {
-      font-family: 'Bangers', cursive;
-      letter-spacing: 0.05em;
-    }
-
-    body, p, span, button, input, select {
-      font-family: 'Fredoka', sans-serif;
-    }
-
-    .comic-border { border: 4px solid black; }
-    .comic-border-lg { border: 6px solid black; }
-    .comic-shadow { box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1); }
-    .comic-shadow-lg { box-shadow: 8px 8px 0px 0px rgba(0, 0, 0, 1); }
-    .comic-shadow-red { box-shadow: 6px 6px 0px 0px #e74c3c; }
-    .comic-shadow-yellow { box-shadow: 6px 6px 0px 0px #f1c40f; }
-
-    .btn-arcade {
-      position: relative;
-      transition: all 0.1s ease;
-      top: 0;
-      left: 0;
-    }
-
-    .btn-arcade:active {
-      top: 4px;
-      left: 4px;
-      box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 1) !important;
-    }
-
-    .soccer-pitch-bg {
-      background-color: #27ae60;
-      background-image:
-        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.15) 0%, transparent 60%),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 50%, transparent 50%);
-      background-size: 100% 100%, 120px 100%;
-    }
-
-    @keyframes float-chibi-1 {
-      0% { transform: translate(0, 0) rotate(0deg) scale(1); }
-      50% { transform: translate(15px, -30px) rotate(5deg) scale(1.05); }
-      100% { transform: translate(0, 0) rotate(0deg) scale(1); }
-    }
-
-    @keyframes float-chibi-2 {
-      0% { transform: translate(0, 0) rotate(0deg) scale(1.05); }
-      50% { transform: translate(-20px, 35px) rotate(-6deg) scale(0.95); }
-      100% { transform: translate(0, 0) rotate(0deg) scale(1.05); }
-    }
-
-    @keyframes float-chibi-3 {
-      0% { transform: translate(0, 0) rotate(0deg) scale(0.98); }
-      50% { transform: translate(25px, 20px) rotate(8deg) scale(1.02); }
-      100% { transform: translate(0, 0) rotate(0deg) scale(0.98); }
-    }
-
-    .animate-chibi-1 { animation: float-chibi-1 12s ease-in-out infinite; }
-    .animate-chibi-2 { animation: float-chibi-2 15s ease-in-out infinite; }
-    .animate-chibi-3 { animation: float-chibi-3 18s ease-in-out infinite; }
-
-    @keyframes pop-save {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.15) rotate(2deg); }
-      100% { transform: scale(1); }
-    }
-
-    .pop-saved { animation: pop-save 0.4s ease-out; }
-
-    .energy-bar-fill {
-      background: linear-gradient(90deg, #39ff14, #2ecc71, #39ff14);
-      background-size: 200% 100%;
-      animation: energy-flow 1.5s linear infinite;
-    }
-
-    @keyframes energy-flow {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 100% 50%; }
-    }
-
-    .locked-card {
-      background-image: repeating-linear-gradient(-45deg, #fdfefe, #fdfefe 10px, #eaeded 10px, #eaeded 20px);
-    }
-
-    ::-webkit-scrollbar { width: 12px; }
-    ::-webkit-scrollbar-track { background: #1b4f72; border-left: 4px solid black; }
-    ::-webkit-scrollbar-thumb { background: #f1c40f; border: 4px solid black; border-radius: 8px; }
-    ::-webkit-scrollbar-thumb:hover { background: #f39c12; }
-
-    @keyframes row-glow {
-      0% { background-color: white; }
-      50% { background-color: #39ff14; transform: scale(1.05); }
-      100% { background-color: white; }
-    }
-    .ranking-climb { animation: row-glow 1.2s ease-out; }
-
-    @keyframes floatUpComic {
-      0% { transform: translateY(10px) scale(0.7) rotate(-5deg); opacity: 0; }
-      25% { opacity: 1; transform: translateY(-30px) scale(1.2) rotate(5deg); }
-      80% { opacity: 1; transform: translateY(-80px) scale(1) rotate(-3deg); }
-      100% { transform: translateY(-130px) scale(0.8) rotate(0deg); opacity: 0; }
-    }
-    .float-comic-text {
-      position: absolute;
-      pointer-events: none;
-      animation: floatUpComic 2s forwards ease-out;
-    }
-  </style>
-</head>
-
-<body class="soccer-pitch-bg text-black min-h-screen relative overflow-x-hidden pb-12">
-
-  <div id="floating-stars-container" class="absolute inset-0 pointer-events-none z-0 overflow-hidden"></div>
-
-  <div id="arcade-toast" class="fixed bottom-6 left-6 z-50 transform translate-y-32 opacity-0 transition-all duration-300 pointer-events-none">
-    <div class="bg-yellow-300 border-4 border-black p-4 rounded-2xl comic-shadow flex items-center gap-3">
-      <div id="toast-icon" class="text-3xl">⚽</div>
-      <div class="text-black font-extrabold text-lg" id="toast-message">¡GOLAZO! Apuesta guardada.</div>
-    </div>
-  </div>
-
-  <div class="relative z-10 max-w-7xl mx-auto px-4 pt-6">
-
-    <header class="bg-yellow-400 border-6 border-black rounded-3xl p-4 sm:p-6 mb-8 comic-shadow-lg relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-4 sm:gap-6">
-      <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(black 20%, transparent 20%), radial-gradient(black 20%, transparent 20%); background-size: 15px 15px; background-position: 0 0, 7.5px 7.5px;"></div>
-
-      <div class="flex items-center gap-3 sm:gap-4 relative z-10 flex-1 min-w-0">
-        <div class="relative shrink-0 group">
-          <div class="absolute inset-0 rounded-full bg-yellow-300 border-4 border-black animate-pulse opacity-60 scale-110 pointer-events-none"></div>
-          <div class="relative w-14 h-14 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full border-4 border-black bg-white overflow-hidden comic-shadow flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
-            <img src="logo DEPINCCO.jpeg" alt="Logo DEPINCCO" class="w-full h-full object-cover object-center" draggable="false" onerror="this.src='https://api.dicebear.com/7.x/identicon/svg?seed=depincco'">
-          </div>
-          <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 bg-black text-yellow-300 text-[7px] sm:text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border border-yellow-400 whitespace-nowrap shadow-md leading-none">
-            DEPINCCO
-          </div>
-        </div>
-
-        <div class="flex items-center gap-2 sm:gap-3 min-w-0">
-          <div class="w-10 h-10 sm:w-14 sm:h-14 bg-white border-4 border-black rounded-full flex items-center justify-center text-xl sm:text-3xl animate-bounce shadow-md shrink-0">⚽</div>
-          <div class="min-w-0">
-            <h1 class="text-xl sm:text-3xl md:text-5xl text-black font-black select-none tracking-wider drop-shadow-md leading-tight truncate">
-              POLLA DEPINCCO MUNDIAL 2026
-            </h1>
-            <p class="text-black text-[10px] sm:text-xs md:text-sm font-bold flex items-center gap-1.5 mt-1 flex-wrap">
-              <span>👑 Host &amp; Creador:</span>
-              <span class="bg-black text-yellow-300 px-2 py-0.5 rounded-full uppercase tracking-wider text-[9px] sm:text-[10px] font-black">EDUARDO QM</span>
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-2 sm:gap-4 flex-wrap relative z-10 justify-center shrink-0">
-        <button id="btn-sound-toggle" onclick="toggleSound()" class="btn-arcade bg-white border-4 border-black p-2 sm:p-2.5 rounded-2xl comic-shadow text-xl sm:text-2xl" title="Mute/Unmute Sonidos">🔊</button>
-
-        <div class="bg-blue-400 border-4 border-black px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl comic-shadow text-center flex flex-col items-center">
-          <span class="text-[9px] sm:text-xs uppercase font-black text-blue-900 leading-none">Hora Local (PERÚ)</span>
-          <span id="txt-simulated-time" class="text-sm sm:text-lg font-black text-white tracking-widest mt-0.5">--:--</span>
-        </div>
-
-        <div id="user-header-status"></div>
-      </div>
-    </header>
-
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-
-      <main class="lg:col-span-8">
-        <div class="bg-orange-500 border-4 border-black rounded-3xl p-3 mb-6 comic-shadow flex items-center overflow-x-auto gap-2 py-4" id="fixture-tabs-container"></div>
-
-        <div class="flex items-center justify-between mb-4 bg-white border-4 border-black p-4 rounded-2xl comic-shadow">
-          <h2 class="text-2xl md:text-3xl font-black text-black flex items-center gap-2" id="title-current-day">📅 JORNADA DE PARTIDOS</h2>
-          <span class="bg-green-500 text-white border-2 border-black font-extrabold px-3 py-1 rounded-full text-xs uppercase" id="badge-match-count">0 Partidos</span>
-        </div>
-
-        <div class="space-y-6" id="matches-list-container"></div>
-
-        <div class="mt-10 bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 border-4 border-black rounded-3xl p-5 sm:p-7 comic-shadow-lg relative overflow-hidden" id="calendario-completo-section">
-          <div class="absolute inset-0 opacity-5 pointer-events-none" style="background-image: radial-gradient(ellipse 80% 50% at 50% 50%, white 0%, transparent 70%), repeating-linear-gradient(0deg, white 0, white 1px, transparent 0, transparent 40px), repeating-linear-gradient(90deg, white 0, white 1px, transparent 0, transparent 40px); background-size: 100% 100%, 40px 40px, 40px 40px;"></div>
-          <div class="relative z-10">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
-              <div>
-                <h2 class="text-2xl sm:text-3xl text-white font-black uppercase tracking-wider flex items-center gap-3"><span>📅</span> CALENDARIO DEL TORNEO</h2>
-                <p class="text-emerald-300 text-xs font-bold mt-1 uppercase tracking-wider">Mundial DEPINCCO 2026 • 80 Partidos</p>
-              </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3" id="calendario-fases-container"></div>
-          </div>
-        </div>
-      </main>
-
-      <aside class="lg:col-span-4 sticky top-6">
-        <div class="bg-cyan-400 border-6 border-black rounded-3xl p-6 mb-8 comic-shadow-lg relative overflow-hidden">
-          <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black), linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black); background-size: 20px 20px; background-position: 0 0, 10px 10px;"></div>
-          
-          <div class="relative z-10">
-            <div class="flex items-center justify-between mb-6">
-              <h2 class="text-3xl text-black font-black tracking-wider flex items-center gap-2">🏆 LOS CRACKS</h2>
-              <span class="text-4xl animate-pulse">🔥</span>
-            </div>
-
-            <div class="bg-green-800 border-4 border-black p-3 rounded-2xl mb-6 relative h-64 overflow-hidden flex flex-col justify-end comic-shadow">
-              <div class="absolute top-2 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center">
-                <span class="text-3xl animate-bounce">🏆</span>
-                <span class="bg-yellow-400 text-black border-2 border-black font-black px-1.5 py-0.5 rounded text-[8px] uppercase tracking-wider leading-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">META</span>
-              </div>
-              <div class="absolute inset-y-0 left-1/2 -translate-x-1/2 w-28 bg-green-700 border-x-4 border-black border-dashed flex justify-around py-8">
-                <div class="w-0.5 h-full bg-white/20 border-dashed border-l"></div>
-                <div class="w-0.5 h-full bg-white/20 border-dashed border-l"></div>
-              </div>
-              <div id="race-track-runners" class="absolute inset-0 z-20 pointer-events-none"></div>
-            </div>
-
-            <div class="space-y-4" id="lista-ranking-usuarios"></div>
-
-            <div class="mt-6 pt-4 border-t-4 border-black border-dashed flex justify-between items-center">
-              <span class="text-xs font-black uppercase text-cyan-900">Total Competidores</span>
-              <span class="bg-black text-white px-3 py-0.5 rounded-full text-xs font-black" id="txt-competitors-count">0</span>
-            </div>
-          </div>
-        </div>
-
-        <div id="mi-cuenta-panel" class="bg-indigo-500 border-6 border-black rounded-3xl p-5 mb-8 comic-shadow-lg hidden relative overflow-hidden">
-          <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: repeating-linear-gradient(45deg, white 0, white 1px, transparent 0, transparent 50%); background-size: 12px 12px;"></div>
-          <div class="relative z-10">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-xl text-white font-black uppercase flex items-center gap-2">📊 MI CUENTA EN VIVO</h3>
-            </div>
-
-            <div class="bg-yellow-400 border-4 border-black rounded-2xl p-4 comic-shadow mb-4 text-center relative overflow-hidden">
-              <div class="text-[10px] text-yellow-900 font-black uppercase tracking-wider">Puntuación Acumulada</div>
-              <div id="mi-cuenta-total-pts" class="text-5xl font-black text-black leading-none mt-1">0</div>
-              <div class="text-xs font-bold text-yellow-800 mt-1">PTS</div>
-              <div class="w-full bg-black/20 border border-black/30 h-3 rounded-full mt-3 overflow-hidden">
-                <div id="mi-cuenta-bar" class="energy-bar-fill h-full rounded-full transition-all duration-700" style="width:0%"></div>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-3 gap-2 mb-4">
-              <div class="bg-white border-3 border-black rounded-xl p-2 text-center comic-shadow">
-                <div class="text-lg font-black" id="mi-cuenta-exactos">0</div>
-                <div class="text-[8px] font-black uppercase text-gray-600">🎯 Exactos</div>
-              </div>
-              <div class="bg-white border-3 border-black rounded-xl p-2 text-center comic-shadow">
-                <div class="text-lg font-black" id="mi-cuenta-parciales">0</div>
-                <div class="text-[8px] font-black uppercase text-gray-600">👍 Aciertos</div>
-              </div>
-              <div class="bg-white border-3 border-black rounded-xl p-2 text-center comic-shadow">
-                <div class="text-lg font-black" id="mi-cuenta-fallos">0</div>
-                <div class="text-[8px] font-black uppercase text-gray-600">❌ Fallos</div>
-              </div>
-            </div>
-
-            <div>
-              <div class="text-[10px] font-black text-white/80 uppercase mb-2 tracking-wider">Historial Realizado</div>
-              <div id="mi-cuenta-historial" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
-            </div>
-          </div>
-        </div>
-      </aside>
-    </div>
-
-    <section id="admin-bottom-section" class="mt-10 mb-6">
-      <div id="admin-login-gate" class="bg-gradient-to-br from-slate-800 to-slate-900 border-4 border-black rounded-3xl p-6 sm:p-8 comic-shadow-lg relative overflow-hidden">
-        <div class="relative z-10 max-w-md mx-auto text-center">
-          <div class="text-5xl mb-3">🔐</div>
-          <h2 class="text-2xl sm:text-3xl text-white font-black uppercase tracking-wider mb-1">PANEL DE CONTROL</h2>
-          <p class="text-slate-400 text-sm font-bold mb-6 uppercase tracking-wider">Exclusivo — Eduardo QM</p>
-
-          <form onsubmit="handleAdminBottomLogin(event)" class="space-y-4">
-            <div class="flex flex-col sm:flex-row gap-3">
-              <div class="flex-1">
-                <label class="block text-slate-300 text-xs font-black uppercase mb-1 text-left">Usuario</label>
-                <input type="text" id="admin-bottom-user" placeholder="eduardo" autocomplete="username" class="w-full bg-white/10 border-2 border-white/20 text-white placeholder-white/30 rounded-xl px-4 py-2.5 font-bold focus:outline-none focus:border-yellow-400">
-              </div>
-              <div class="flex-1">
-                <label class="block text-slate-300 text-xs font-black uppercase mb-1 text-left">Contraseña</label>
-                <input type="password" id="admin-bottom-pass" placeholder="•••••" autocomplete="current-password" class="w-full bg-white/10 border-2 border-white/20 text-white placeholder-white/30 rounded-xl px-4 py-2.5 font-bold focus:outline-none focus:border-yellow-400">
-              </div>
-            </div>
-            <button type="submit" class="w-full bg-yellow-400 border-4 border-black text-black font-black py-3 rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-sm uppercase">
-              👮‍♂️ INGRESAR COMO ANFITRIÓN
-            </button>
-          </form>
-          <p id="admin-bottom-error" class="text-red-400 text-xs font-black mt-3 hidden">❌ Credenciales incorrectas.</p>
-        </div>
-      </div>
-
-      <div id="admin-control-board-inline" class="hidden">
-        <div class="bg-gradient-to-r from-red-600 to-red-800 border-4 border-black rounded-3xl p-5 sm:p-6 mb-4 comic-shadow-lg relative overflow-hidden">
-          <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <h2 class="text-2xl sm:text-3xl text-yellow-300 font-black uppercase tracking-wider">MESA DE CONTROL</h2>
-              <p class="text-red-100 text-xs font-bold uppercase">Gestión de Partidos en Línea — Eduardo QM</p>
-            </div>
-            <button onclick="logoutAdminBottom()" class="bg-black border-4 border-yellow-400 text-yellow-300 font-black text-xs px-4 py-2 rounded-xl">🚪 Salir</button>
-          </div>
-        </div>
-        <div class="space-y-3" id="admin-inline-matches-list"></div>
-      </div>
-    </section>
-
-    <footer class="mt-12 bg-red-600 border-6 border-black rounded-3xl p-6 mb-8 comic-shadow-lg flex flex-col sm:flex-row items-center justify-between gap-6">
-      <div class="flex items-center gap-4 text-white">
-        <span class="text-5xl animate-bounce">📺</span>
-        <div>
-          <h3 class="text-2xl md:text-3xl font-black uppercase tracking-wider text-yellow-300">¡VIVE EL MUNDIAL EN VIVO!</h3>
-          <p class="text-sm font-bold text-red-100">Mira los encuentros oficiales de la jornada en directo.</p>
-        </div>
-      </div>
-      <a href="https://tvgo.americatv.com.pe/" target="_blank" rel="noopener noreferrer" class="btn-arcade bg-yellow-400 text-black border-4 border-black font-black py-4 px-8 rounded-2xl comic-shadow text-lg">
-        ⚽ VER POR AMÉRICA TV GO 🚀
-      </a>
-    </footer>
-
-  </div>
-
-  <div id="auth-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 hidden">
-    <div class="bg-yellow-300 border-6 border-black rounded-3xl max-w-md w-full p-4 sm:p-6 comic-shadow-lg relative flex flex-col max-h-[90vh] overflow-hidden">
-      <div class="text-center mb-4">
-        <h2 class="text-2xl sm:text-3xl text-black font-black uppercase">🏃‍♂️ INGRESA TU NOMBRE</h2>
-        <p class="text-xs text-yellow-950 font-bold">¡Regístrate para guardar tus pronósticos en la lista de Eduardo QM!</p>
-      </div>
-
-      <form id="auth-form-user" onsubmit="handleRegistration(event)" class="space-y-4 overflow-y-auto pr-1">
-        <div>
-          <label class="block text-black font-black text-xs sm:text-sm uppercase mb-1">Tu Nombre</label>
-          <input type="text" id="reg-nombres" required placeholder="Ej. Lio" class="w-full border-4 border-black rounded-2xl px-4 py-2.5 font-bold focus:bg-yellow-100">
-        </div>
-        <div>
-          <label class="block text-black font-black text-xs sm:text-sm uppercase mb-1">Tu Apellido</label>
-          <input type="text" id="reg-apellidos" required placeholder="Ej. Messi" class="w-full border-4 border-black rounded-2xl px-4 py-2.5 font-bold focus:bg-yellow-100">
-        </div>
-
-        <div class="space-y-2">
-          <label class="block text-black font-black text-xs sm:text-sm uppercase">Elige tu personaje</label>
-          <div class="grid grid-cols-5 gap-2" id="avatar-selector-grid"></div>
-        </div>
-
-        <button type="submit" class="btn-arcade bg-green-500 border-4 border-black text-white font-black py-3 rounded-2xl comic-shadow w-full text-base">
-          ¡INGRESAR A LA FIESTA! 🚀
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <div id="bet-pop-alert" class="fixed inset-0 pointer-events-none z-50 flex items-center justify-center hidden">
-    <div class="bg-white border-6 border-black p-6 rounded-3xl comic-shadow-lg text-center transform scale-90 opacity-0 transition-all duration-200" id="bet-pop-content">
-      <div class="text-6xl animate-bounce mb-2">⚽🔥</div>
-      <h3 class="text-3xl font-black text-black uppercase">¡APUESTA ENVIADA!</h3>
-      <p class="font-extrabold text-green-600 text-sm">Tu predicción fue guardada en Firebase.</p>
-    </div>
-  </div>
-
-  <div class="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-1">
-    <button onclick="document.getElementById('admin-bottom-section').scrollIntoView({behavior:'smooth'});" class="btn-arcade bg-purple-600 border-4 border-black text-white w-14 h-14 rounded-full shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-2xl flex items-center justify-center">👮‍♂️</button>
-    <span class="bg-black text-yellow-300 text-[8px] font-black px-2 py-0.5 rounded-full border border-purple-400 uppercase">ADMIN</span>
-  </div>
-
-  <script type="module">
+<script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, set, push, onValue, update, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // 1. CONFIGURACIÓN COMPLETA DE TU BASE DE DATOS
+    // 1. CONFIGURACIÓN CENTRAL DE FIREBASE
     const firebaseConfig = {
-      apiKey: "AIzaSyCyfQhc38wMXSZ1nIIAnWGXiL_e7GjbshA", // Firebase la lee automáticamente por el authDomain, no necesitas cambiar esto si usas modo de prueba
+      apiKey: "AIzaSyCyfQhc38wMXSZ1nIIAnWGXiL_e7GjbshA", // Firebase autentica internamente por el dominio
       authDomain: "apuesta-mundial2026.firebaseapp.com",
       databaseURL: "https://apuesta-mundial2026-default-rtdb.firebaseio.com/",
       projectId: "apuesta-mundial2026",
@@ -413,7 +16,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Variables locales de control
+    // Estado reactivo de la aplicación
     let state = {
       currentUser: JSON.parse(localStorage.getItem('polla_current_user')) || null,
       users: [],
@@ -425,12 +28,12 @@
     let currentFilteredDay = "Jue 11";
 
     const CHIBI_AVATARS = {
-      messi: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#aed6f1" stroke="black" stroke-width="4"/><circle cx="50" cy="48" r="22" fill="#ffd1b3" stroke="black" stroke-width="3"/><circle cx="43" cy="45" r="3" fill="black"/><circle cx="57" cy="45" r="3" fill="black"/><path d="M 45,55 Q 50,60 55,55" stroke="black" stroke-width="3" fill="none"/></svg>`,
-      cr7: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#f5b041" stroke="black" stroke-width="4"/><circle cx="50" cy="48" r="22" fill="#f5cba7" stroke="black" stroke-width="3"/><circle cx="43" cy="45" r="3" fill="black"/><circle cx="57" cy="45" r="3" fill="black"/><path d="M 45,55 Q 50,58 55,55" stroke="black" stroke-width="3" fill="none"/></svg>`,
-      mbappe: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#a569bd" stroke="black" stroke-width="4"/><circle cx="50" cy="48" r="24" fill="#8d6e63" stroke="black" stroke-width="3"/><circle cx="43" cy="45" r="3" fill="black"/><circle cx="57" cy="45" r="3" fill="black"/></svg>`,
-      neymar: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#f9e79f" stroke="black" stroke-width="4"/><circle cx="50" cy="50" r="22" fill="#e59866" stroke="black" stroke-width="3"/><circle cx="42" cy="48" r="3" fill="black"/><circle cx="58" cy="48" r="3" fill="black"/></svg>`,
-      haaland: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#5ad" stroke="black" stroke-width="4"/><circle cx="50" cy="48" r="22" fill="#fdebd0" stroke="black" stroke-width="3"/></svg>`,
-      eduardo: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="#bb8fce" stroke="black" stroke-width="4"/><circle cx="50" cy="50" r="22" fill="#fdebd0" stroke="black" stroke-width="3"/><circle cx="42" cy="46" r="3.5" fill="black"/><circle cx="58" cy="46" r="3.5" fill="black"/><path d="M 42,58 Q 50,64 58,58" stroke="black" stroke-width="3" fill="none"/></svg>`
+      messi: `<svg viewBox="0 0 100 100" class="w-full h-full"><circle cx="50" cy="50" r="45" fill="#aed6f1" stroke="black" stroke-width="4"/><path d="M 25,45 Q 50,20 75,45 Q 85,55 75,65 Q 50,75 25,65 Q 15,55 25,45 Z" fill="#5c3a21" stroke="black" stroke-width="2"/><circle cx="50" cy="48" r="22" fill="#ffd1b3" stroke="black" stroke-width="3"/><circle cx="43" cy="45" r="3" fill="black"/><circle cx="57" cy="45" r="3" fill="black"/><path d="M 45,55 Q 50,60 55,55" stroke="black" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
+      cr7: `<svg viewBox="0 0 100 100" class="w-full h-full"><circle cx="50" cy="50" r="45" fill="#f5b041" stroke="black" stroke-width="4"/><path d="M 20,40 L 30,25 L 40,20 L 50,15 L 60,20 L 70,25 L 80,40 C 80,40 50,30 20,40 Z" fill="#2c3e50" stroke="black" stroke-width="2"/><circle cx="50" cy="48" r="22" fill="#f5cba7" stroke="black" stroke-width="3"/><circle cx="43" cy="45" r="3" fill="black"/><circle cx="57" cy="45" r="3" fill="black"/><path d="M 45,56 Q 52,58 55,54" stroke="black" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
+      mbappe: `<svg viewBox="0 0 100 100" class="w-full h-full"><circle cx="50" cy="50" r="45" fill="#a569bd" stroke="black" stroke-width="4"/><circle cx="50" cy="48" r="24" fill="#8d6e63" stroke="black" stroke-width="3"/><circle cx="40" cy="46" r="3" fill="black"/><circle cx="60" cy="46" r="3" fill="black"/><path d="M 40,58 Q 50,65 60,58" stroke="black" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
+      neymar: `<svg viewBox="0 0 100 100" class="w-full h-full"><circle cx="50" cy="50" r="45" fill="#f9e79f" stroke="black" stroke-width="4"/><circle cx="50" cy="50" r="22" fill="#e59866" stroke="black" stroke-width="3"/><circle cx="42" cy="48" r="3" fill="black"/><circle cx="58" cy="48" r="3" fill="black"/><path d="M 42,58 Q 50,66 58,58" stroke="black" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
+      haaland: `<svg viewBox="0 0 100 100" class="w-full h-full"><circle cx="50" cy="50" r="45" fill="#5ad" stroke="black" stroke-width="4"/><circle cx="50" cy="48" r="22" fill="#fdebd0" stroke="black" stroke-width="3"/><path d="M 38,46 Q 42,49 46,46" stroke="black" stroke-width="3" fill="none"/><path d="M 54,46 Q 58,49 62,46" stroke="black" stroke-width="3" fill="none"/></svg>`,
+      eduardo: `<svg viewBox="0 0 100 100" class="w-full h-full"><circle cx="50" cy="50" r="45" fill="#bb8fce" stroke="black" stroke-width="4"/><path d="M 26,40 C 26,25 74,25 74,40 Z" fill="#27ae60" stroke="black" stroke-width="3"/><circle cx="50" cy="50" r="22" fill="#fdebd0" stroke="black" stroke-width="3"/><circle cx="42" cy="46" r="3.5" fill="black"/><circle cx="58" cy="46" r="3.5" fill="black"/><path d="M 42,58 Q 50,64 58,58" stroke="black" stroke-width="3" fill="none"/></svg>`
     };
 
     const COUNTRY_ISO_CODES = {
@@ -460,7 +63,7 @@
       { id: 11, dia: "Dom 14", fechaCompleta: "Domingo 14 de junio", equipoLocal: "Costa de Marfil", equipoVisitante: "Ecuador", hora: "18:00" },
       { id: 12, dia: "Dom 14", fechaCompleta: "Domingo 14 de junio", equipoLocal: "Suecia", equipoVisitante: "Túnez", hora: "21:00" },
       { id: 13, dia: "Lun 15", fechaCompleta: "Lunes 15 de junio", equipoLocal: "España", equipoVisitante: "Cabo Verde", hora: "11:00" },
-      { id: 14, py: "Lun 15", fechaCompleta: "Lunes 15 de junio", equipoLocal: "Bélgica", equipoVisitante: "Egipto", hora: "14:00" },
+      { id: 14, dia: "Lun 15", fechaCompleta: "Lunes 15 de junio", equipoLocal: "Bélgica", equipoVisitante: "Egipto", hora: "14:00" },
       { id: 15, dia: "Lun 15", fechaCompleta: "Lunes 15 de junio", equipoLocal: "Arabia Saudita", equipoVisitante: "Uruguay", hora: "17:00" },
       { id: 16, dia: "Lun 15", fechaCompleta: "Lunes 15 de junio", equipoLocal: "Irán", equipoVisitante: "Nueva Zelanda", hora: "20:00" },
       { id: 17, dia: "Mar 16", fechaCompleta: "Martes 16 de junio", equipoLocal: "Francia", equipoVisitante: "Senegal", hora: "14:00" },
@@ -489,51 +92,26 @@
       { id: 40, dia: "Dom 21", fechaCompleta: "Domingo 21 de junio", equipoLocal: "Egipto", equipoVisitante: "Nueva Zelanda", hora: "20:00" }
     ];
 
-    // SINCRONIZACIÓN FIREBASE EN TIEMPO REAL
-    function sincronizarConFirebase() {
-      // Escuchar Usuarios
-      onValue(ref(db, 'usuarios'), (snapshot) => {
-        const data = snapshot.val();
-        state.users = data ? Object.values(data) : [];
-        
-        // Mantener sesión actualizada si cambian puntos remotos
-        if (state.currentUser) {
-          const uActualizado = state.users.find(u => u.id === state.currentUser.id);
-          if (uActualizado) {
-            state.currentUser = uActualizado;
-            localStorage.setItem('polla_current_user', JSON.stringify(uActualizado));
-          }
-        }
-        renderRanking();
-        renderMiCuenta();
-        checkAuth();
-      });
-
-      // Escuchar Partidos
+    // CONECTAR Y ESCUCHAR BASE DE DATOS EN TIEMPO REAL
+    function comenzarSincronizacion() {
+      // 1. Escuchar todos los partidos
       onValue(ref(db, 'partidos'), (snapshot) => {
         const data = snapshot.val();
         if (data) {
           state.matches = Object.values(data);
         } else {
-          // Si no existen partidos en Firebase, subir el fixture inicial
-          const initMatches = {};
+          // Si la BD está vacía, cargar fixture inicial estructurado
+          const initMap = {};
           FIXTURE_DATA.forEach(m => {
-            initMatches[m.id] = {
-              id: m.id, dia: m.dia, fechaCompleta: m.fechaCompleta,
-              equipoLocal: m.equipoLocal, equipoVisitante: m.equipoVisitante, hora: m.hora,
-              golesLocalReal: null, golesVisitanteReal: null, estado: 'programado'
-            };
+            initMap[m.id] = { ...m, golesLocalReal: null, golesVisitanteReal: null, estado: 'programado' };
           });
-          set(ref(db, 'partidos'), initMatches);
-          state.matches = Object.values(initMatches);
+          set(ref(db, 'partidos'), initMap);
+          state.matches = Object.values(initMap);
         }
-        renderMatches();
-        renderFixtureTabs();
-        renderCalendarioFases();
-        if (state.currentUser?.rol === 'admin') renderInlineAdminBoard();
+        refrescarTodo();
       });
 
-      // Escuchar Apuestas de todos
+      // 2. Escuchar todas las apuestas
       onValue(ref(db, 'apuestas'), (snapshot) => {
         const data = snapshot.val();
         state.bets = [];
@@ -543,58 +121,90 @@
               state.bets.push({
                 usuarioId: uId,
                 partidoId: parseInt(pId),
-                ...data[uId][pId]
+                golesLocalPred: data[uId][pId].goles_local_pred,
+                golesVisitantePred: data[uId][pId].goles_visitante_pred,
+                prediccionGanador: data[uId][pId].prediccionGanador,
+                puntosGanados: data[uId][pId].puntosGanados || 0
               });
             });
           });
         }
-        renderMatches();
-        renderMiCuenta();
+        refrescarTodo();
+      });
+
+      // 3. Escuchar todos los usuarios
+      onValue(ref(db, 'usuarios'), (snapshot) => {
+        const data = snapshot.val();
+        state.users = data ? Object.values(data) : [];
+        
+        // Mantener sesión de LocalStorage sincronizada
+        if (state.currentUser) {
+          const uCloud = state.users.find(u => u.id === state.currentUser.id);
+          if (uCloud) {
+            state.currentUser = uCloud;
+            localStorage.setItem('polla_current_user', JSON.stringify(uCloud));
+          }
+        }
+        refrescarTodo();
       });
     }
 
-    // REGISTRO DE AMIGOS EN FIREBASE
+    function refrescarTodo() {
+      renderFixtureTabs();
+      renderMatches();
+      renderRanking();
+      renderMiCuenta();
+      renderCalendarioFases();
+      checkAuth();
+      if (state.currentUser?.rol === 'admin') renderInlineAdminBoard();
+    }
+
+    // REGISTRO DE PARTICIPANTES
     window.registrarAmigo = function (nombres, apellidos, avatarSeleccionado) {
       if (!nombres || !apellidos) {
         alert("¡Eduardo dice: Pon tus nombres y apellidos completos para cobrar la apuesta! 📝");
         return;
       }
-
       const nuevoUsuarioRef = push(ref(db, 'usuarios'));
       const userId = nuevoUsuarioRef.key;
 
       const nuevoUsuario = {
-        id: userId,
-        nombres: nombres,
-        apellidos: apellidos,
-        foto_url: avatarSeleccionado || 'messi',
-        puntos_totales: 0,
-        rol: "jugador"
+        id: userId, nombres: nombres, apellidos: apellidos,
+        foto_url: avatarSeleccionado || 'messi', puntos_totales: 0, rol: "jugador"
       };
 
       set(nuevoUsuarioRef, nuevoUsuario).then(() => {
         localStorage.setItem('polla_current_user', JSON.stringify(nuevoUsuario));
         state.currentUser = nuevoUsuario;
-        alert("¡Ya estás dentro de la Pollada de Eduardo QM! Cierra esta ventana y empieza a votar. ⚽🔥");
         location.reload();
       });
     };
 
-    // GUARDAR APUESTAS EN FIREBASE
-    window.guardarPrediccion = function (partidoId, golesLocal, golesVisitante) {
-      if (!state.currentUser) {
-        alert("Primero debes registrarte en la parte superior para poder apostar. 🛑");
-        return;
-      }
+    // BOTÓN DE APUESTA RÁPIDA / MARCADOR EXACTO
+    window.setWinnerMode = function(matchId, winChar) {
+      if (!state.currentUser) { alert("Regístrate en la parte superior para poder apostar. 🛑"); return; }
+      const match = state.matches.find(m => m.id === matchId);
+      if (match && isMatchLocked(match)) { alert("¡Apuestas cerradas! 🔒"); return; }
 
+      // Cambiar inputs según el modo arcade rápido para que el usuario vea feedback
+      const inputL = document.getElementById(`pred-local-${matchId}`);
+      const inputV = document.getElementById(`pred-visitante-${matchId}`);
+      if (winChar === 'L') { inputL.value = 1; inputV.value = 0; }
+      if (winChar === 'V') { inputL.value = 0; inputV.value = 1; }
+      if (winChar === 'E') { inputL.value = 1; inputV.value = 1; }
+      if (winChar === 'AA') { inputL.value = 2; inputV.value = 2; }
+
+      window.guardarPrediccion(matchId, inputL.value, inputV.value);
+    };
+
+    // GUARDAR EN FIREBASE Y ACTIVAR ANIMACIÓN POP
+    window.guardarPrediccion = function (partidoId, golesLocal, golesVisitante) {
+      if (!state.currentUser) { alert("Regístrate primero en la parte superior para poder apostar. 🛑"); return; }
       const match = state.matches.find(m => m.id === partidoId);
-      if (match && isMatchLocked(match)) {
-        alert("¡Este partido ya cerró sus apuestas! 🔒");
-        return;
-      }
+      if (match && isMatchLocked(match)) { alert("¡Este partido ya cerró sus inscripciones! 🔒"); return; }
 
       if (golesLocal === '' || golesVisitante === '') {
-        alert("Debes llenar los goles de ambos equipos.");
+        alert("¡Ingresa goles válidos para mandar la apuesta!");
         return;
       }
 
@@ -611,68 +221,61 @@
         fecha_apuesta: new Date().toISOString(),
         puntosGanados: 0
       }).then(() => {
-        // Efecto animado Pop de éxito
+        // Animaciones y Sonido Arcade Pop
         const card = document.getElementById(`match-card-${partidoId}`);
-        if(card) card.classList.add('pop-saved');
-        
+        if (card) card.classList.add('pop-saved');
+
         const popAlert = document.getElementById('bet-pop-alert');
         const popContent = document.getElementById('bet-pop-content');
         popAlert.classList.remove('hidden');
         popContent.classList.remove('scale-90', 'opacity-0');
         popContent.classList.add('scale-100', 'opacity-100');
-        
+
         setTimeout(() => {
           popContent.classList.remove('scale-100', 'opacity-100');
           popContent.classList.add('scale-90', 'opacity-0');
           popAlert.classList.add('hidden');
-          if(card) card.classList.remove('pop-saved');
+          if (card) card.classList.remove('pop-saved');
         }, 1200);
       });
     };
 
-    // ALGORITMO Y GUARDADO DEL RESULTADO REAL (MESA DE CONTROL)
+    // LÓGICA DE ACTUALIZACIÓN DEL ADMINISTRADOR (EDUARDO QM)
     window.saveRealScoreFromBoard = function(matchId) {
       const gLVal = document.getElementById(`board-local-${matchId}`).value;
       const gVVal = document.getElementById(`board-visitante-${matchId}`).value;
 
-      if (gLVal === '' || gVVal === '') {
-        alert("Eduardo, ingresa los marcadores reales de ambos equipos.");
-        return;
-      }
+      if (gLVal === '' || gVVal === '') { alert("Eduardo, pon el marcador completo antes de guardar. 🔑"); return; }
 
       const gLReal = parseInt(gLVal);
       const gVReal = parseInt(gVVal);
-      
       let resultadoReal = 'E';
       if (gLReal > gVReal) resultadoReal = 'L';
       if (gLReal < gVReal) resultadoReal = 'V';
 
-      // Actualizar estado del partido en Firebase
       update(ref(db, `partidos/${matchId}`), {
         golesLocalReal: gLReal,
         golesVisitanteReal: gVReal,
         estado: 'jugado'
       }).then(async () => {
-        // Traer todas las apuestas para calcular puntos remotos al instante
+        // Ejecución automática del algoritmo en la nube
         const apuestasSnap = await get(ref(db, 'apuestas'));
         const todasLasApuestas = apuestasSnap.val() || {};
-        
-        // 1. Recorrer y actualizar puntos por apuesta del partido
-        const usuariosIds = Object.keys(todasLasApuestas);
-        for (let uId of usuariosIds) {
+
+        for (let uId of Object.keys(todasLasApuestas)) {
           if (todasLasApuestas[uId][matchId]) {
             const bet = todasLasApuestas[uId][matchId];
             let pts = 0;
             if (bet.goles_local_pred === gLReal && bet.goles_visitante_pred === gVReal) {
               pts = 3; // Marcador exacto
             } else if (bet.prediccionGanador === resultadoReal) {
-              pts = 1; // Acierto simple
+              pts = 1; // Solo ganador o empate
             }
             await update(ref(db, `apuestas/${uId}/${matchId}`), { puntosGanados: pts });
           }
         }
 
-        // 2. Recalcular y actualizar los totales de cada usuario en la BD
+        // Acumular puntos en tabla de usuarios para mover la barra de progreso
         const usuariosSnap = await get(ref(db, 'usuarios'));
         const todosLosUsuarios = usuariosSnap.val() || {};
         const apuestasActualizadasSnap = await get(ref(db, 'apuestas'));
@@ -687,29 +290,11 @@
           }
           await update(ref(db, `usuarios/${uId}`), { puntos_totales: totalPts });
         }
-
-        confetti({ particleCount: 150, spread: 80, origin: { y: 0.5 } });
-        alert("¡Resultados reales guardados y puntos de todos los amigos recalculados en la nube! 🚀🏆");
+        confetti({ particleCount: 140, spread: 70, origin: { y: 0.5 } });
       });
     };
 
-    // CONTROL DE BLOQUEO DE TIEMPO
-    function isMatchLocked(match) {
-      const matchData = FIXTURE_DATA.find(f => f.id === match.id);
-      if (!matchData) return false;
-      const matchDia = matchData.dia.match(/\d+/);
-      if (!matchDia) return false;
-      
-      const dia = matchDia[0].padStart(2, '0');
-      const mes = matchData.fechaCompleta.toLowerCase().includes('julio') ? '07' : '06';
-      const horaPartido = new Date(`2026-${mes}-${dia}T${matchData.hora}:00-05:00`);
-      
-      const ahora = new Date();
-      const diferenciaMinutos = (horaPartido - ahora) / (1000 * 60);
-      return diferenciaMinutos <= 10 || match.estado === 'jugado';
-    }
-
-    // REFRESCAR ELEMENTOS VISUALES EN LA PÁGINA
+    // RENDERIZAR PARTIDOS INTEGRANDO LAS APUESTAS GUARDADAS EN LAS CASILLAS
     function renderMatches() {
       const container = document.getElementById('matches-list-container');
       if (!container) return;
@@ -721,10 +306,12 @@
 
       partidosDia.forEach(match => {
         const locked = isMatchLocked(match);
+        // Buscar la apuesta del usuario logueado en este dispositivo para meterla en las casillas
         const miApuesta = state.currentUser ? state.bets.find(b => b.usuarioId === state.currentUser.id && b.partidoId === match.id) : null;
 
-        const golesL = miApuesta?.goles_local_pred !== undefined ? miApuesta.goles_local_pred : '';
-        const golesV = miApuesta?.goles_visitante_pred !== undefined ? miApuesta.goles_visitante_pred : '';
+        const golesL = miApuesta?.golesLocalPred !== undefined && miApuesta?.golesLocalPred !== null ? miApuesta.golesLocalPred : '';
+        const golesV = miApuesta?.golesVisitantePred !== undefined && miApuesta?.golesVisitantePred !== null ? miApuesta.golesVisitantePred : '';
+        const ganadorPred = miApuesta?.prediccionGanador || '';
         const golesLReal = match.golesLocalReal !== null ? match.golesLocalReal : '-';
         const golesVReal = match.golesVisitanteReal !== null ? match.golesVisitanteReal : '-';
 
@@ -738,38 +325,46 @@
         card.innerHTML = `
           <div class="flex-1 w-full flex items-center justify-between gap-4">
             <div class="flex-1 flex flex-col items-center text-center">
-              <img src="https://flagcdn.com/w160/${codeLocal}.png" class="w-12 h-8 sm:w-16 sm:h-10 border-2 border-black rounded-lg object-cover">
+              <img src="https://flagcdn.com/w160/${codeLocal}.png" class="w-12 h-8 sm:w-16 sm:h-10 border-2 border-black rounded-lg object-cover shadow">
               <span class="font-black text-black text-xs sm:text-sm mt-2">${match.equipoLocal.toUpperCase()}</span>
-              <input type="number" min="0" id="pred-local-${match.id}" value="${golesL}" ${locked ? 'disabled' : ''} class="w-12 h-10 border-4 border-black rounded-xl text-center font-black text-lg mt-2 disabled:bg-gray-100">
+              <input type="number" min="0" id="pred-local-${match.id}" value="${golesL}" ${locked ? 'disabled' : ''} class="w-12 h-10 border-4 border-black rounded-xl text-center font-black text-lg mt-2 focus:bg-yellow-50 disabled:bg-gray-100">
             </div>
 
             <div class="flex flex-col items-center relative select-none">
-              ${locked ? '<span class="absolute -top-4 text-lg">🔒</span>' : ''}
+              ${locked ? '<span class="absolute -top-5 text-lg">🔒</span>' : ''}
               <div class="${match.estado === 'jugado' ? 'bg-green-500 text-white' : 'bg-blue-400 text-white'} font-black text-[10px] uppercase px-2 py-0.5 rounded-full border-2 border-black mb-2">${match.estado === 'jugado' ? 'Finalizado' : match.hora}</div>
-              <div class="text-xl font-black">VS</div>
-              <div class="mt-2 bg-black text-yellow-300 font-black text-sm px-3 py-1 rounded-lg border-2 border-black tracking-widest">${golesLReal} : ${golesVReal}</div>
+              <div class="text-xl font-black text-black">VS</div>
+              <div class="mt-2 bg-black text-yellow-300 font-black text-sm px-3 py-1 rounded-lg border-2 border-black tracking-widest comic-shadow">${golesLReal} : ${golesVReal}</div>
             </div>
 
             <div class="flex-1 flex flex-col items-center text-center">
-              <img src="https://flagcdn.com/w160/${codeVisitante}.png" class="w-12 h-8 sm:w-16 sm:h-10 border-2 border-black rounded-lg object-cover">
+              <img src="https://flagcdn.com/w160/${codeVisitante}.png" class="w-12 h-8 sm:w-16 sm:h-10 border-2 border-black rounded-lg object-cover shadow">
               <span class="font-black text-black text-xs sm:text-sm mt-2">${match.equipoVisitante.toUpperCase()}</span>
-              <input type="number" min="0" id="pred-visitante-${match.id}" value="${golesV}" ${locked ? 'disabled' : ''} class="w-12 h-10 border-4 border-black rounded-xl text-center font-black text-lg mt-2 disabled:bg-gray-100">
+              <input type="number" min="0" id="pred-visitante-${match.id}" value="${golesV}" ${locked ? 'disabled' : ''} class="w-12 h-10 border-4 border-black rounded-xl text-center font-black text-lg mt-2 focus:bg-yellow-50 disabled:bg-gray-100">
             </div>
           </div>
 
-          <div class="w-full md:w-48 flex flex-col justify-center border-t-4 md:border-t-0 md:border-l-4 border-black border-dashed pt-4 md:pt-0 md:pl-4 self-stretch">
+          <div class="w-full md:w-52 flex flex-col justify-center border-t-4 md:border-t-0 md:border-l-4 border-black border-dashed pt-4 md:pt-0 md:pl-4 self-stretch">
+            <div class="grid grid-cols-3 gap-1 mb-2 ${locked ? 'hidden' : ''}">
+              <button onclick="setWinnerMode(${match.id}, 'L')" class="py-1 border-2 border-black font-black text-[9px] uppercase rounded-lg ${ganadorPred==='L'?'bg-blue-400 text-white':'bg-gray-100'}">🏠 Loc</button>
+              <button onclick="setWinnerMode(${match.id}, 'E')" class="py-1 border-2 border-black font-black text-[9px] uppercase rounded-lg ${ganadorPred==='E'?'bg-yellow-400 text-black':'bg-gray-100'}">🤝 Emp</button>
+              <button onclick="setWinnerMode(${match.id}, 'V')" class="py-1 border-2 border-black font-black text-[9px] uppercase rounded-lg ${ganadorPred==='V'?'bg-red-400 text-white':'bg-gray-100'}">✈️ Vis</button>
+            </div>
+
             ${match.estado === 'jugado' && miApuesta 
-              ? `<div class="bg-yellow-100 border-2 border-black p-2 rounded-xl mb-2 text-center text-xs font-black"> Ganaste +${miApuesta.puntosGanados} PTS ${miApuesta.puntosGanados === 3 ? '🎯🔥' : miApuesta.puntosGanados === 1 ? '👍' : '❌'}</div>` 
+              ? `<div class="bg-yellow-100 border-2 border-black p-2 rounded-xl mb-2 text-center text-xs font-black text-black"> Ganaste +${miApuesta.puntosGanados} PTS ${miApuesta.puntosGanados === 3 ? '🎯🔥' : miApuesta.puntosGanados === 1 ? '👍' : '❌'}</div>` 
               : ''}
+            
             ${locked 
-              ? `<div class="bg-gray-200 border-4 border-black p-2 rounded-xl text-center font-black text-xs text-gray-600">🔒 CERRADO</div>` 
-              : `<button onclick="window.guardarPrediccion(${match.id}, document.getElementById('pred-local-${match.id}').value, document.getElementById('pred-visitante-${match.id}').value)" class="btn-arcade bg-green-500 border-4 border-black text-white font-black py-2 rounded-xl comic-shadow text-xs uppercase">¡APUESTAR! ⚽</button>`}
+              ? `<div class="bg-gray-200 border-4 border-black p-2.5 rounded-xl text-center font-black text-xs text-gray-500 uppercase">🔒 CERRADO</div>` 
+              : `<button onclick="window.guardarPrediccion(${match.id}, document.getElementById('pred-local-${match.id}').value, document.getElementById('pred-visitante-${match.id}').value)" class="btn-arcade bg-green-500 border-4 border-black text-white font-black py-2.5 px-4 rounded-xl comic-shadow text-xs uppercase">¡APUESTAR! ⚽</button>`}
           </div>
         `;
         container.appendChild(card);
       });
     }
 
+    // RENDERIZAR EL RANKING LATERAL RETRO
     function renderRanking() {
       const container = document.getElementById('lista-ranking-usuarios');
       if (!container) return;
@@ -790,15 +385,15 @@
           : `<img src="https://api.dicebear.com/7.x/bottts/svg?seed=${u.nombres}" class="w-10 h-10 rounded-xl border-2 border-black bg-white">`;
 
         const row = document.createElement('div');
-        row.className = `flex items-center gap-3 p-2 bg-white border-4 border-black rounded-2xl comic-shadow mb-2 cursor-pointer hover:bg-yellow-100 transition-all`;
+        row.className = `flex items-center gap-3 p-2 bg-white border-4 border-black rounded-2xl comic-shadow mb-2 cursor-pointer hover:bg-yellow-100 transition-all ${u.id === state.currentUser?.id ? 'bg-yellow-50 ring-2 ring-yellow-400' : ''}`;
         row.onclick = () => switchUser(u);
 
         row.innerHTML = `
           <div class="w-8 h-8 flex items-center justify-center font-black text-sm rounded-full bg-black text-white">${medalla}</div>
           <div class="relative">${avatarHtml}</div>
           <div class="flex-1 min-w-0">
-            <h4 class="font-black text-xs text-black truncate">${u.nombres} ${u.apellidos} ${u.id === state.currentUser?.id ? '⭐' : ''}</h4>
-            <div class="w-full bg-gray-200 border-2 border-black h-3 rounded-lg overflow-hidden mt-1 relative">
+            <h4 class="font-black text-xs text-black truncate">${u.nombres} ${u.apellidos} ${u.id === state.currentUser?.id ? '(TÚ)' : ''}</h4>
+            <div class="w-full bg-gray-200 border-2 border-black h-4 rounded-lg overflow-hidden mt-1 relative">
               <div class="energy-bar-fill h-full transition-all duration-500" style="width: ${porcentajeBarra}%"></div>
             </div>
           </div>
@@ -830,13 +425,14 @@
         runner.style.transform = 'translateX(-50%)';
 
         runner.innerHTML = `
-          <div class="bg-black text-white text-[7px] font-black px-1 rounded border border-black leading-none">${u.nombres.substring(0,6)}</div>
-          <div class="w-6 h-6 rounded-full border border-black bg-white flex items-center justify-center text-xs shadow">${CHIBI_AVATARS[u.foto_url] ? '⚽' : '👤'}</div>
+          <div class="bg-black text-white text-[7px] font-black px-1 rounded border border-black leading-none mb-0.5 shadow">${u.nombres.substring(0,6)}</div>
+          <div class="w-7 h-7 rounded-full border border-black bg-yellow-300 flex items-center justify-center text-xs shadow ${u.id === state.currentUser?.id ? 'ring-2 ring-white':''}">${CHIBI_AVATARS[u.foto_url] ? '⚽' : '👤'}</div>
         `;
         container.appendChild(runner);
       });
     }
 
+    // PANEL DE ESTADÍSTICAS DEL PARTICIPANTE Y HISTORIAL RECUPERADOS
     function renderMiCuenta() {
       const panel = document.getElementById('mi-cuenta-panel');
       if (!panel || !state.currentUser) return;
@@ -854,20 +450,25 @@
       document.getElementById('mi-cuenta-fallos').innerText = fallos;
       document.getElementById('mi-cuenta-total-pts').innerText = state.currentUser.puntos_totales || 0;
 
+      const maxGlobalPts = Math.max(...state.users.map(u => u.puntos_totales), 1);
+      document.getElementById('mi-cuenta-bar').style.width = `${Math.round((state.currentUser.puntos_totales / maxGlobalPts) * 100)}%`;
+
       const histEl = document.getElementById('mi-cuenta-historial');
       if (betsJugadas.length === 0) {
         histEl.innerHTML = '<div class="text-[10px] text-white/60 font-bold text-center py-2">No hay partidos jugados aún.</div>';
       } else {
         histEl.innerHTML = betsJugadas.map(b => {
           const m = state.matches.find(match => match.id === b.partidoId);
-          return `<div class="bg-white border-2 border-black p-1.5 rounded-xl text-[10px] text-black font-bold mb-1 flex justify-between">
-            <div>⚽ ${m.equipoLocal} vs ${m.equipoVisitante} (Real: ${m.golesLocalReal}-${m.golesVisitanteReal})</div>
-            <div class="text-green-600 font-black">+${b.puntosGanados} PTS</div>
+          const icon = b.puntosGanados === 3 ? '🎯' : b.puntosGanados === 1 ? '👍' : '❌';
+          return `<div class="bg-white border-2 border-black p-2 rounded-xl text-[10px] text-black font-extrabold mb-1.5 flex justify-between shadow">
+            <div>⚽ ${m.equipoLocal} vs ${m.equipoVisitante} (Real: ${m.golesLocalReal}-${m.golesVisitanteReal}) <br><span class="text-gray-500 font-bold">Mi pred: ${b.golesLocalPred}-${b.golesVisitantePred}</span></div>
+            <div class="text-black font-black text-xs self-center bg-yellow-300 px-2 py-0.5 rounded-lg border border-black">${icon} +${b.puntosGanados}</div>
           </div>`;
         }).join('');
       }
     }
 
+    // MESA DE CONTROL COMPLETA
     function renderInlineAdminBoard() {
       const container = document.getElementById('admin-inline-matches-list');
       if (!container) return;
@@ -879,56 +480,14 @@
         row.innerHTML = `
           <div class="text-xs font-black text-black">${match.equipoLocal} vs ${match.equipoVisitante} (${match.hora})</div>
           <div class="flex items-center gap-2">
-            <input type="number" min="0" id="board-local-${match.id}" value="${match.golesLocalReal !== null ? match.golesLocalReal : ''}" class="w-10 h-8 border-2 border-black text-center font-black rounded">
+            <input type="number" min="0" id="board-local-${match.id}" value="${match.golesLocalReal !== null ? match.golesLocalReal : ''}" class="w-10 h-8 border-2 border-black text-center font-black rounded focus:bg-yellow-50">
             <span>:</span>
-            <input type="number" min="0" id="board-visitante-${match.id}" value="${match.golesVisitanteReal !== null ? match.golesVisitanteReal : ''}" class="w-10 h-8 border-2 border-black text-center font-black rounded">
+            <input type="number" min="0" id="board-visitante-${match.id}" value="${match.golesVisitanteReal !== null ? match.golesVisitanteReal : ''}" class="w-10 h-8 border-2 border-black text-center font-black rounded focus:bg-yellow-50">
             <button onclick="saveRealScoreFromBoard(${match.id})" class="bg-green-500 border-2 border-black text-white font-black text-[10px] px-3 py-1 rounded-xl">💾 GUARDAR</button>
           </div>
         `;
         container.appendChild(row);
       });
-    }
-
-    function switchUser(user) {
-      state.currentUser = user;
-      localStorage.setItem('polla_current_user', JSON.stringify(user));
-      renderMatches();
-      renderMiCuenta();
-      renderHeaderUserStatus();
-    }
-
-    window.handleAdminBottomLogin = function(e) {
-      e.preventDefault();
-      const user = document.getElementById('admin-bottom-user').value.trim().toLowerCase();
-      const pass = document.getElementById('admin-bottom-pass').value.trim();
-      const errorMsg = document.getElementById('admin-bottom-error');
-
-      if (user === 'eduardo' && pass === '123456') {
-        errorMsg.classList.add('hidden');
-        state.currentUser = { id: 'admin-eduardo', nombres: 'Eduardo', apellidos: 'QM', foto_url: 'eduardo', rol: 'admin', puntos_totales: 0 };
-        localStorage.setItem('polla_current_user', JSON.stringify(state.currentUser));
-        document.getElementById('admin-login-gate').classList.add('hidden');
-        document.getElementById('admin-control-board-inline').classList.remove('hidden');
-        renderInlineAdminBoard();
-        checkAuth();
-      } else {
-        errorMsg.classList.remove('hidden');
-      }
-    };
-
-    window.logoutAdminBottom = function() {
-      state.currentUser = null;
-      localStorage.removeItem('polla_current_user');
-      document.getElementById('admin-login-gate').classList.remove('hidden');
-      document.getElementById('admin-control-board-inline').classList.add('hidden');
-      checkAuth();
-    };
-
-    function handleRegistration(e) {
-      e.preventDefault();
-      const nombres = document.getElementById('reg-nombres').value.trim();
-      const apellidos = document.getElementById('reg-apellidos').value.trim();
-      window.registrarAmigo(nombres, apellidos, selectedAvatar);
     }
 
     function checkAuth() {
@@ -939,11 +498,17 @@
         document.getElementById('auth-modal').classList.add('hidden');
         renderHeaderUserStatus();
         renderMiCuenta();
-        if (state.currentUser.rol === 'admin') {
+        if (state.currentUser.role === 'admin' || state.currentUser.rol === 'admin') {
           document.getElementById('admin-login-gate').classList.add('hidden');
           document.getElementById('admin-control-board-inline').classList.remove('hidden');
         }
       }
+    }
+
+    function switchUser(user) {
+      state.currentUser = user;
+      localStorage.setItem('polla_current_user', JSON.stringify(user));
+      refrescarTodo();
     }
 
     function renderHeaderUserStatus() {
@@ -951,9 +516,9 @@
       if (!container || !state.currentUser) return;
       const u = state.currentUser;
       container.innerHTML = `
-        <div class="bg-white border-4 border-black p-2 rounded-2xl comic-shadow flex items-center gap-3">
-          <div class="font-black text-sm text-black">🏃‍♂️ ${u.nombres} ${u.apellidos}</div>
-          <button onclick="localStorage.removeItem('polla_current_user'); location.reload();" class="text-red-500 font-black text-xs"> CERRAR </button>
+        <div class="bg-white border-4 border-black p-2 rounded-2xl comic-shadow flex items-center gap-3 select-none">
+          <div class="font-black text-xs sm:text-sm text-black uppercase leading-none">🏃‍♂️ ${u.nombres} ${u.apellidos}</div>
+          <button onclick="localStorage.removeItem('polla_current_user'); location.reload();" class="text-red-500 font-black text-xs hover:text-red-700">SALIR</button>
         </div>
       `;
     }
@@ -965,7 +530,7 @@
       const diasUnicos = ["Jue 11", "Vie 12", "Sáb 13", "Dom 14", "Lun 15", "Mar 16", "Mié 17", "Jue 18", "Vie 19", "Sáb 20", "Dom 21"];
       diasUnicos.forEach(dia => {
         const button = document.createElement('button');
-        button.className = `btn-arcade font-black text-xs px-3 py-1.5 rounded-xl border-4 border-black ${currentFilteredDay === dia ? 'bg-yellow-400' : 'bg-white'}`;
+        button.className = `btn-arcade font-black text-xs px-3.5 py-1.5 rounded-xl border-4 border-black select-none ${currentFilteredDay === dia ? 'bg-yellow-400 shadow-none translate-y-0.5' : 'bg-white comic-shadow'}`;
         button.innerText = dia;
         button.onclick = () => { currentFilteredDay = dia; renderFixtureTabs(); renderMatches(); };
         container.appendChild(button);
@@ -979,7 +544,7 @@
       Object.keys(CHIBI_AVATARS).forEach(key => {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = `w-full border-2 border-black rounded-xl p-1 bg-white ${selectedAvatar === key ? 'bg-yellow-100 border-4 border-yellow-500' : ''}`;
+        btn.className = `w-full border-2 border-black rounded-xl p-1 bg-white ${selectedAvatar === key ? 'bg-yellow-100 border-4 border-yellow-500 scale-105' : ''}`;
         btn.innerHTML = CHIBI_AVATARS[key];
         btn.onclick = () => { selectedAvatar = key; renderAvatarSelector(); };
         container.appendChild(btn);
@@ -989,29 +554,71 @@
     function renderCalendarioFases() {
       const container = document.getElementById('calendario-fases-container');
       if (!container) return;
-      container.innerHTML = `<div class="bg-emerald-800 text-white p-3 rounded-xl border-2 border-black text-center text-xs font-black col-span-4">📅 MUNDIAL EN CURSO (80 PARTIDOS)</div>`;
+      
+      const totalPartidos = state.matches.length;
+      const finalizados = state.matches.filter(m => m.estado === 'jugado').length;
+      const pct = totalPartidos > 0 ? Math.round((finalizados / totalPartidos) * 100) : 0;
+
+      container.innerHTML = `
+        <div class="bg-gradient-to-r from-emerald-800 to-emerald-950 border-4 border-black p-4 rounded-2xl flex flex-col justify-between gap-2 col-span-1 sm:col-span-2 xl:col-span-4 shadow">
+          <div class="flex justify-between text-white font-black text-xs uppercase tracking-wide">
+            <span>🏟️ Progreso General</span>
+            <span class="text-yellow-300">${finalizados}/${totalPartidos} Jugados</span>
+          </div>
+          <div class="w-full bg-white/20 border-2 border-black h-5 rounded-lg overflow-hidden relative">
+            <div class="bg-green-400 h-full transition-all duration-700" style="width: ${pct}%"></div>
+            <span class="absolute inset-0 flex items-center justify-center text-[10px] font-black text-white tracking-widest">${pct}% COMPLETO</span>
+          </div>
+        </div>
+      `;
     }
 
-    // Inicializar reloj
+    // CONTROL DEL RELOJ EN VIVO DE PERÚ
     setInterval(() => {
       const timeSpan = document.getElementById('txt-simulated-time');
       if (timeSpan) {
         const d = new Date();
-        const peruTime = d.toLocaleString("en-US", { timeZone: "America/Lima", hour: '2-digit', minute: '2-digit', hour12: false });
+        const peruTime = d.toLocaleString("en-US", { timeZone: "America/Lima", hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
         timeSpan.innerText = peruTime;
       }
     }, 1000);
 
-    // Arranque
+    // CONTROL DE SONIDO MOCK
+    window.toggleSound = function() {
+      const btn = document.getElementById('btn-sound-toggle');
+      if(btn.innerText === '🔊') { btn.innerText = '🔇'; } else { btn.innerText = '🔊'; }
+    };
+
+    window.handleAdminBottomLogin = function(e) {
+      e.preventDefault();
+      const user = document.getElementById('admin-bottom-user').value.trim().toLowerCase();
+      const pass = document.getElementById('admin-bottom-pass').value.trim();
+      const errorMsg = document.getElementById('admin-bottom-error');
+
+      if (user === 'eduardo' && pass === '123456') {
+        errorMsg.classList.add('hidden');
+        state.currentUser = { id: 'admin-eduardo', nombres: 'Eduardo', apellidos: 'QM', foto_url: 'eduardo', rol: 'admin', puntos_totales: 0 };
+        localStorage.setItem('polla_current_user', JSON.stringify(state.currentUser));
+        document.getElementById('admin-login-gate').classList.add('hidden');
+        document.getElementById('admin-control-board-inline').classList.remove('hidden');
+        refrescarTodo();
+      } else {
+        errorMsg.classList.remove('hidden');
+      }
+    };
+
+    window.logoutAdminBottom = function() {
+      state.currentUser = null;
+      localStorage.removeItem('polla_current_user');
+      document.getElementById('admin-login-gate').classList.remove('hidden');
+      document.getElementById('admin-control-board-inline').classList.add('hidden');
+      refrescarTodo();
+    };
+
     window.addEventListener('DOMContentLoaded', () => {
-      sincronizarConFirebase();
+      comenzarSincronizacion();
       renderAvatarSelector();
-      renderFixtureTabs();
     });
 
-    // Vincular funciones a los formularios del DOM tradicional
     document.getElementById('auth-form-user').onsubmit = handleRegistration;
   </script>
-</body>
-
-</html>
