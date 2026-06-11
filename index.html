@@ -44,6 +44,31 @@
   <!-- Canvas Confetti CDN -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
+  <!-- ==========================================
+       CONEXIÓN A FIREBASE (SDK Modular por CDN)
+       ========================================== -->
+  <script type="module">
+    // Importamos desde el CDN de Google para usar Vanilla JS sin empaquetadores
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
+
+    // Configuración de tu proyecto
+    const firebaseConfig = {
+      apiKey: "AIzaSyCyfQhc38wMXSZ1nIIAnWGXiL_e7GjbshA",
+      authDomain: "eduardo-b8c9c.firebaseapp.com",
+      projectId: "eduardo-b8c9c",
+      storageBucket: "eduardo-b8c9c.firebasestorage.app",
+      messagingSenderId: "838012668919",
+      appId: "1:838012668919:web:a1c484b5c2c3e425ca3cf2",
+      measurementId: "G-TJTMSSWX5K"
+    };
+
+    // Inicializar Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    console.log("🔥 Firebase inicializado y conectado correctamente.");
+  </script>
+
   <style>
     /* Aplicar fuentes a todo el proyecto */
     h1,
@@ -370,8 +395,10 @@
         <!-- Reloj / Hora en Línea (Perú) -->
         <div
           class="bg-blue-400 border-4 border-black px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl comic-shadow text-center flex flex-col items-center">
-          <span class="text-[9px] sm:text-xs uppercase font-black text-blue-900 leading-none" title="Hora Oficial de Perú (UTC-5)">Hora Local (PERÚ)</span>
-          <span id="txt-simulated-time" class="text-sm sm:text-lg font-black text-white tracking-widest mt-0.5">--:--</span>
+          <span class="text-[9px] sm:text-xs uppercase font-black text-blue-900 leading-none"
+            title="Hora Oficial de Perú (UTC-5)">Hora Local (PERÚ)</span>
+          <span id="txt-simulated-time"
+            class="text-sm sm:text-lg font-black text-white tracking-widest mt-0.5">--:--</span>
         </div>
 
         <!-- Usuario Autenticado / Botón Registro -->
