@@ -48,25 +48,118 @@
        CONEXIÓN A FIREBASE (SDK Modular por CDN)
        ========================================== -->
   <script type="module">
-    // Importamos desde el CDN de Google para usar Vanilla JS sin empaquetadores
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, push, onValue, update, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // Configuración de tu proyecto
     const firebaseConfig = {
       apiKey: "AIzaSyCyfQhc38wMXSZ1nIIAnWGXiL_e7GjbshA",
-      authDomain: "eduardo-b8c9c.firebaseapp.com",
-      projectId: "eduardo-b8c9c",
-      storageBucket: "eduardo-b8c9c.firebasestorage.app",
-      messagingSenderId: "838012668919",
-      appId: "1:838012668919:web:a1c484b5c2c3e425ca3cf2",
-      measurementId: "G-TJTMSSWX5K"
+      authDomain: "apuesta-mundial2026.firebaseapp.com",
+      databaseURL: "https://apuesta-mundial2026-default-rtdb.firebaseio.com/",
+      projectId: "apuesta-mundial2026",
+      storageBucket: "apuesta-mundial2026.appspot.com",
+      messagingSenderId: "1838012668919",
+      appId: "1:838012668919:web:a1c484b5c2c3e425ca3cf2"
     };
 
-    // Inicializar Firebase
     const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-    console.log("🔥 Firebase inicializado y conectado correctamente.");
+    const db = getDatabase(app);
+
+    let usuarioActual = JSON.parse(localStorage.getItem('usuario_pollada')) || null;
+
+    window.registrarAmigo = function (nombres, apellidos, avatarSeleccionado) {
+      if (!nombres || !apellidos) {
+        alert("¡Eduardo dice: Pon tus nombres y apellidos completos para cobrar la apuesta! 📝");
+        return;
+      }
+
+      const nuevoUsuarioRef = push(ref(db, 'usuarios'));
+      const userId = nuevoUsuarioRef.key;
+
+      const nuevoUsuario = {
+        id: userId,
+        nombres: nombres,
+        apellidos: apellidos,
+        foto_url: avatarSeleccionado || 'https://api.dicebear.com/7.x/bottts/svg?seed=futbol',
+        puntos_totales: 0,
+        rol: "jugador"
+      };
+
+      set(nuevoUsuarioRef, nuevoUsuario).then(() => {
+        localStorage.setItem('usuario_pollada', JSON.stringify(nuevoUsuario));
+        usuarioActual = nuevoUsuario;
+        alert("¡Ya estás dentro de la Pollada de Eduardo QM! Cierra esta ventana y empieza a votar. ⚽🔥");
+        location.reload();
+      });
+    };
+
+    function verificarBloqueoPartidos(partidos) {
+      const ahora = new Date();
+      partidos.forEach(partido => {
+        const horaPartido = new Date(partido.fecha_hora_iso);
+        const diferenciaMinutos = (horaPartido - ahora) / (1000 * 60);
+        if (diferenciaMinutos <= 10) {
+          const inputsPartido = document.querySelectorAll(`[data-partido-id="${partido.id}"]`);
+          inputsPartido.forEach(input => {
+            input.disabled = true;
+            input.classList.add('bg-gray-300', 'cursor-not-allowed', 'opacity-50');
+          });
+          const candado = document.getElementById(`candado-${partido.id}`);
+          if (candado) candado.classList.remove('hidden');
+        }
+      });
+    }
+
+    window.guardarPrediccion = function (partidoId, golesLocal, golesVisitante) {
+      if (!usuarioActual) {
+        alert("Primero debes registrarte en la parte superior para poder apostar. 🛑");
+        return;
+      }
+      update(ref(db, `apuestas/${usuarioActual.id}/${partidoId}`), {
+        goles_local_pred: parseInt(golesLocal),
+        goles_visitante_pred: parseInt(golesVisitante),
+        fecha_apuesta: new Date().toISOString()
+      }).then(() => {
+        alert("¡Apuesta registrada con éxito! Eduardo ya la guardó en su libreta. 💾");
+      });
+    };
+
+    onValue(ref(db, 'usuarios'), (snapshot) => {
+      const datos = snapshot.val();
+      if (datos) {
+        const listaUsuarios = Object.values(datos);
+        listaUsuarios.sort((a, b) => b.puntos_totales - a.puntos_totales);
+        const maxPuntos = listaUsuarios[0].puntos_totales || 1;
+        const contenedorRanking = document.getElementById('lista-ranking-usuarios');
+        if (contenedorRanking) {
+          contenedorRanking.innerHTML = '';
+          listaUsuarios.forEach((user, index) => {
+            const porcentajeBarra = Math.min((user.puntos_totales / maxPuntos) * 100, 100);
+            let decoracionPodio = '';
+            if (index === 0) decoracionPodio = '👑';
+            if (index === 1) decoracionPodio = '🥈';
+            if (index === 2) decoracionPodio = '🥉';
+
+            contenedorRanking.innerHTML += `
+                    <div class="flex items-center gap-3 p-2 bg-white border-2 border-black rounded-xl shadow-md transform transition-all duration-500 hover:scale-105 mb-2">
+                        <span class="text-lg font-black">${decoracionPodio || index + 1}</span>
+                        <img src="${user.foto_url}" class="w-10 h-10 rounded-full border-2 border-black bg-yellow-300" alt="Avatar">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-sm text-black border-b border-dashed border-gray-300">${user.nombres} ${user.apellidos}</h4>
+                            <div class="w-full bg-gray-200 h-3 rounded-full border border-black overflow-hidden mt-1">
+                                <div class="bg-green-400 h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_8px_#4ade80]" style="width: ${porcentajeBarra}%"></div>
+                            </div>
+                        </div>
+                        <div class="bg-black text-yellow-400 font-black p-1 rounded-lg text-xs min-w-[45px] text-center">
+                            🔥 ${user.puntos_totales} Pts
+                        </div>
+                    </div>
+                `;
+          });
+        }
+      }
+    });
+
+    window.verificarBloqueoPartidos = verificarBloqueoPartidos;
   </script>
 
   <style>
@@ -535,8 +628,8 @@
             </div>
 
             <!-- Contenedor del Ranking -->
-            <div class="space-y-4" id="ranking-list-container">
-              <!-- Renderizado de las filas de ranking -->
+            <div class="space-y-4" id="lista-ranking-usuarios">
+              <!-- Renderizado automático por Firebase -->
             </div>
 
             <div class="mt-6 pt-4 border-t-4 border-black border-dashed flex justify-between items-center">
@@ -1260,6 +1353,23 @@
         { id: 80, dia: "Dom 13 Jul", fechaCompleta: "Domingo 13 de julio 🏆 GRAN FINAL", equipoLocal: "Ganador Semi 1", equipoVisitante: "Ganador Semi 2", hora: "18:00" }
       ];
 
+      // Generar fecha_hora_iso para bloqueo automático
+      FIXTURE_DATA.forEach(f => {
+        const matchDia = f.dia.match(/\d+/);
+        if (matchDia) {
+          const dia = matchDia[0].padStart(2, '0');
+          const mes = f.fechaCompleta.toLowerCase().includes('julio') ? '07' : '06';
+          f.fecha_hora_iso = `2026-${mes}-${dia}T${f.hora}:00-05:00`;
+        }
+      });
+
+      // Iniciar el chequeo periódico de bloqueos
+      setInterval(() => {
+        if (window.verificarBloqueoPartidos) {
+          window.verificarBloqueoPartidos(FIXTURE_DATA);
+        }
+      }, 60000);
+
       // Variables de Estado de la Aplicación (con persistencia LocalStorage)
       let state = {
         systemTime: "2026-06-10T22:03:00", // Hora simulada inicial (10 de junio 2026 10:03 PM)
@@ -1344,19 +1454,73 @@
         saveStateToLocalStorage();
       }
 
-      // Guardar Estado
+      // Guardar Estado (Ahora en Firebase)
       function saveStateToLocalStorage() {
-        localStorage.setItem('polla_mundialista_state', JSON.stringify(state));
+        // Mantenemos al currentUser en LocalStorage para no perder la sesión al recargar
+        if (state.currentUser) {
+          localStorage.setItem('polla_current_user', JSON.stringify(state.currentUser));
+        }
+
+        if (!window.firebaseDB) {
+          console.warn("Firebase DB no inicializada aún");
+          return;
+        }
+
+        const stateRef = window.firebaseRef(window.firebaseDB, 'state');
+        // Sincronizamos la información global
+        window.firebaseSet(stateRef, {
+          systemTime: state.systemTime,
+          users: state.users,
+          matches: state.matches,
+          bets: state.bets
+        });
       }
 
-      // Cargar Estado
+      // Cargar Estado (Ahora desde Firebase en tiempo real)
       function loadStateFromLocalStorage() {
-        const stored = localStorage.getItem('polla_mundialista_state');
-        if (stored) {
-          state = JSON.parse(stored);
-        } else {
-          initDefaultData();
+        // 1. Recuperar la sesión del usuario actual
+        const storedUser = localStorage.getItem('polla_current_user');
+        if (storedUser) {
+          state.currentUser = JSON.parse(storedUser);
         }
+
+        // 2. Escuchar cambios globales de Firebase
+        if (!window.firebaseDB) {
+          setTimeout(loadStateFromLocalStorage, 200);
+          return;
+        }
+
+        const stateRef = window.firebaseRef(window.firebaseDB, 'state');
+        window.firebaseOnValue(stateRef, (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            state.users = data.users || [];
+            state.matches = data.matches || [];
+            state.bets = data.bets || [];
+            state.systemTime = data.systemTime || state.systemTime;
+
+            // Actualizar datos del currentUser si hubo cambios remotos (ej: cambio de puntos)
+            if (state.currentUser) {
+              const updatedUser = state.users.find(u => u.id === state.currentUser.id);
+              if (updatedUser) {
+                state.currentUser = updatedUser;
+              }
+            }
+
+            // Renderizar la app con los nuevos datos
+            renderRanking();
+            renderFixtureTabs();
+            renderMatches();
+            if (typeof renderCalendarioFases === 'function') renderCalendarioFases();
+            checkAuth();
+            if (state.currentUser && state.currentUser.rol === 'admin') {
+              if (typeof renderInlineAdminBoard === 'function') renderInlineAdminBoard();
+            }
+          } else {
+            // Base de datos vacía, inicializar datos por defecto y subirlos a Firebase
+            initDefaultData();
+          }
+        });
       }
 
       // ==========================================
@@ -1694,35 +1858,9 @@
           fotoUrl = selectedAvatar; // Guardar el identificador del avatar predeterminado
         }
 
-        // Crear nuevo usuario
-        const nuevoUsuario = {
-          id: `user-${Date.now()}`,
-          nombres,
-          apellidos,
-          foto_url: fotoUrl,
-          puntos_totales: 0,
-          rol: (nombres.toLowerCase() === 'eduardo' && apellidos.toLowerCase() === 'qm') ? 'admin' : 'user'
-        };
-
-        // Agregar a la lista de usuarios si no existe
-        state.users.push(nuevoUsuario);
-        state.currentUser = nuevoUsuario;
-        saveStateToLocalStorage();
-
-        AudioFX.playSuccess();
-        confetti({
-          particleCount: 150,
-          spread: 80,
-          origin: { y: 0.6 }
-        });
-
-        checkAuth();
-        recalculatePoints(); // Inicializar su puntuación en 0 y ordenar ranking
-        renderRanking();
-        renderFixtureTabs();
-        renderMatches();
-
-        showArcadeToast(`¡Bienvenido a la Polla, ${nombres}! ⚽`, '🏆');
+        if (window.registrarAmigo) {
+          window.registrarAmigo(nombres, apellidos, fotoUrl);
+        }
       }
 
       // Cambiar pestañas de login en el modal
@@ -1980,7 +2118,7 @@
               
               <!-- Input goles de predicción (bloqueados si está cerrado) -->
               <div class="mt-2 sm:mt-3 flex items-center gap-1">
-                <input type="number" min="0" max="99" id="pred-local-${match.id}" value="${golesL}" 
+                <input type="number" min="0" max="99" id="pred-local-${match.id}" data-partido-id="${match.id}" value="${golesL}" 
                   ${locked ? 'disabled' : ''} 
                   onchange="updateLocalPrediction(${match.id})"
                   class="w-10 h-10 sm:w-14 sm:h-12 border-2 sm:border-4 border-black rounded-lg sm:rounded-xl text-center text-base sm:text-xl font-black focus:outline-none focus:bg-yellow-100 disabled:bg-gray-100 disabled:text-gray-500">
@@ -1988,7 +2126,8 @@
             </div>
 
             <!-- Divisor / VS -->
-            <div class="flex flex-col items-center px-1 sm:px-2 select-none">
+            <div class="flex flex-col items-center px-1 sm:px-2 select-none relative">
+              <span id="candado-${match.id}" class="${locked ? '' : 'hidden'} absolute -top-4 text-xl animate-bounce">🔒</span>
               <!-- Estado Visual de Eduardo QM / Admin -->
               ${match.estado === 'jugado'
               ? `<div class="bg-green-500 text-white font-black text-[9px] sm:text-xs uppercase px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full border-2 border-black mb-1.5 sm:mb-2 animate-pulse whitespace-nowrap">Finalizado</div>`
@@ -2010,7 +2149,7 @@
               
               <!-- Input goles de predicción -->
               <div class="mt-2 sm:mt-3 flex items-center gap-1">
-                <input type="number" min="0" max="99" id="pred-visitante-${match.id}" value="${golesV}" 
+                <input type="number" min="0" max="99" id="pred-visitante-${match.id}" data-partido-id="${match.id}" value="${golesV}" 
                   ${locked ? 'disabled' : ''} 
                   onchange="updateLocalPrediction(${match.id})"
                   class="w-10 h-10 sm:w-14 sm:h-12 border-2 sm:border-4 border-black rounded-lg sm:rounded-xl text-center text-base sm:text-xl font-black focus:outline-none focus:bg-yellow-100 disabled:bg-gray-100 disabled:text-gray-500">
@@ -2023,7 +2162,7 @@
           <div class="w-full md:w-56 flex flex-col justify-between items-stretch border-t-4 md:border-t-0 md:border-l-4 border-black border-dashed pt-4 md:pt-0 md:pl-6 self-stretch">
             
             <!-- Selector Rápido -->
-            <div class="mb-3">
+            <div class="mb-3 hidden"> <!-- Oculto para no interferir con el guardado exacto -->
               <div class="text-[10px] text-gray-500 font-extrabold uppercase mb-1 text-center md:text-left">Apuesta Rápida (+1 PTS)</div>
               <div class="flex justify-between gap-1 flex-wrap">
                 <button onclick="setWinnerMode(${match.id}, 'L')" ${locked ? 'disabled' : ''} 
@@ -2066,13 +2205,13 @@
             <!-- Botón de Guardado / Estado Cerrado -->
             ${locked
               ? `
-              <div class="bg-gray-200 border-4 border-black p-2.5 rounded-2xl flex items-center justify-center gap-2 text-gray-700 font-extrabold text-sm uppercase">
+              <div class="bg-gray-200 border-4 border-black p-2.5 rounded-2xl flex items-center justify-center gap-2 text-gray-700 font-extrabold text-sm uppercase mt-auto">
                 <span>🔒 CERRADO</span>
               </div>
               `
               : `
-              <button onclick="savePrediction(${match.id})" 
-                class="btn-arcade bg-green-500 hover:bg-green-400 border-4 border-black text-white font-black py-2.5 px-4 rounded-2xl comic-shadow text-center text-sm w-full">
+              <button onclick="window.guardarPrediccion(${match.id}, document.getElementById('pred-local-${match.id}').value, document.getElementById('pred-visitante-${match.id}').value)" 
+                class="btn-arcade bg-green-500 hover:bg-green-400 border-4 border-black text-white font-black py-2.5 px-4 rounded-2xl comic-shadow text-center text-sm w-full mt-auto">
                 ¡APUESTAR! ⚽
               </button>
               `
